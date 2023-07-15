@@ -1,0 +1,7 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+inversion.Rcheck/
+inversion*.tar.gz
+inversion*.tgz
