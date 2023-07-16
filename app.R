@@ -79,69 +79,74 @@ ui <- fluidPage(
             .campo-rojo {
               color: red;
             }
+            #Este estilo es para quitar las flechas del campo y ganar un poco de espacio
+            .shiny-input-container > .form-control {
+                -webkit-appearance: none;
+                -moz-appearance: textfield;
+              }
+              .shiny-input-container > .form-control::-webkit-inner-spin-button,
+              .shiny-input-container > .form-control::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+              }
           ")),
         fluidRow(
           column(width = 12,
                  h5("Ingresos")
           )),
         fluidRow(
-          column(width = 5,
-                 tags$h6("Entrada"),
-                 class="campos_formulario_h6",                 
-                 numericInput("entrada", "", value = 15000)
+          column(width = 4,
+                 class = "campos_formulario_h6",
+                 tags$h6("Entrada", title = "Entrada aportada para los gastos"),
+                 box(
+                   width = NULL,  # Deja que el ancho del box se ajuste automáticamente al contenido
+                   solidHeader = TRUE,
+                   numericInput("entrada", "", value = 15000)
+                 )
           ),
-          column(width = 3,
+          column(width = 4,
                  class="campos_formulario_h6",
-                 tags$h6("Capacidad de pago"),
+                 tags$h6("Ingresos", title = "Ingresos mensuales de los cuales solo se usará el 33%"),
+                 numericInput("ingresos", "", value = 3300)
+          ),
+          column(width = 4,
+                 class="campos_formulario_h6",
+                 tags$h6("Deudas", title = "Deudas mensuales que restan a los ingresos"),
+                 numericInput("deudas", "", value = 560)
+          )),
+
+        fluidRow(        
+          column(width = 4,
+                 class="campos_formulario_h6",
+                 tags$h6("Capacidad", title = "Capacidad de pago anual"),
                  box(
                    width = 1,
                    solidHeader = TRUE,
                    actionButton("boton_capacidad_pago",
                                 icon("calculator"),
                                 title = "Calcula la capacidad de pago en función de los ingresos y los gastos")
-                 ),
-          ),
-          column(width = 4,
+                 )),
+          column(width = 8,
                  class="campos_formulario_h6",
-                 numericInput("capacidad_de_pago", "", value = 0)
+                 tags$h6("Capacidad de pago", title = "Capacidad de pago en función de los ingresos y los gastos"),
+                 tags$input(id = "capacidad_de_pago",
+                            type = "number",
+                            value = 0,
+                            style = "pointer-events: none;  border: none;")
           ),
         ),
-        fluidRow(
+        fluidRow(          
           column(width = 6,
                  class="campos_formulario_h6",
-                 tags$h6("Ingresos (se usara el 33%)"),
-                 numericInput("ingresos", "", value = 3300)
+                 tags$h6("Plazo deseado (anual) ", title = "Plazo en años que desea pagar la hipoteca"),
+                 numericInput("plazo_ingresos", "", value = 26)
           ),
           column(width = 6,
                  class="campos_formulario_h6",
-                 tags$h6("Deudas"),
-                 numericInput("deudas", "", value = 560)
-          )
-        )
+                 tags$h6("Plazo deseado (meses)", title = "Plazo en meses que desea pagar la hipoteca"),
+                 numericInput("plazo_meses_ingresos", "", value = 312)
+          ))
       ),#Fin del div capacidad de pago
-      div(class = "divider", style = "border-top: 4px solid darkgray; margin: 10px 0;"),
-      tags$style(HTML("
-            h5 {margin-bottom: 2px;margin-top: 2px;
-              color: blue; /* Color azul para los encabezados h5 */
-            }
-            .campos_formulario_h6 {
-              margin-bottom: 1px;
-              margin-top: 1px;
-              color: black;
-              display: flex;
-              align-items: center;
-            }
-            divider {
-              border-top: 2px solid black;
-              margin: 10px 0;
-            }
-            resultado-error {
-              color: red;
-            }
-            .campo-rojo {
-              color: #ff0000;
-            }
-          ")),
+      div(class = "divider", style = "border-top: 4px solid darkgray; margin: 10px ;"),
       #DIV de vivienda
       div(
         fluidRow(
@@ -151,33 +156,13 @@ ui <- fluidPage(
         fluidRow(
           column(width = 6,
                  class="campos_formulario_h6",
-                 tags$h6("Precio venta"),
+                 tags$h6("Precio venta", title = "Precio de venta del inmueble"),
                  numericInput("precio_venta", "", value = 180000)
           ),
           column(width = 6,
                  class="campos_formulario_h6",
-                 tags$h6("Tasación"),
+                 tags$h6("Tasación", title = "Tasación oficial o propuesta"),
                  numericInput("tasacion", "", value = 200000)
-          ),
-        ),
-        fluidRow(
-          column(width = 4,
-                 class="campos_formulario_h6",
-                 tags$h6("90 % Tasación"),
-                 box(
-                   width = 1,
-                   solidHeader = TRUE,
-                   actionButton("boton_calcular_entrada",
-                    icon("calculator"),
-                    title = "Calcula la entrada mínima")
-                 )),
-          column(width = 8,
-                 class="campos_formulario_h6",
-                 tags$h6("Entrada minima"),
-                 tags$input(id = "entrada_minima",
-                            type = "number",
-                            value = 0,
-                            style = "pointer-events: none;  border: none;")
           ),
         )
       ),#Fin del div vivienda 
@@ -208,17 +193,17 @@ ui <- fluidPage(
         fluidRow(
           column(width = 4,
                  class="campos_formulario_h6",
-                 tags$h6("% banco"),
+                 tags$h6("% banco", title = "Porcentaje de gastos respecto el precio de venta"),
                  numericInput("gastos_hipotecarios", "", value = 7)
           ),
           column(width = 4,
                  class="campos_formulario_h6",
-                 tags$h6("% gestión"),
+                 tags$h6("% gestión", title = "Porcentaje de gastos de gestion respecto el precio de venta"),
                  numericInput("comisiones", "", value = 5)
           ),
           column(width = 4,
                  class="campos_formulario_h6",
-                 tags$h6("% Max hipoteca"),
+                 tags$h6("% Max hipoteca", title = "Porcentaje máximo de la hipoteca que concede el banco"),
                  numericInput("maxima_hipoteca", "", value = 90)
           ),
         ),
@@ -228,6 +213,26 @@ ui <- fluidPage(
                tags$h6("Préstamo solicitado"),
                numericInput("prestamo", "", value = 158000)
         ),
+       ),
+       fluidRow(
+         column(width = 4,
+                class="campos_formulario_h6",
+                tags$h6("Entrada mínima", title = "Calcula la entrada mínima para cubrir el 90% máximo hipotecable"),
+                box(
+                  width = 1,
+                  solidHeader = TRUE,
+                  actionButton("boton_calcular_entrada",
+                               icon("calculator"),
+                               title = "Calcula la entrada mínima")
+                )),
+         column(width = 8,
+                class="campos_formulario_h6",
+                tags$h6("Entrada minima", title = "Entrada mínima para cubrir gastos de compraventa y 10% de tasacion o precio de venta"),
+                tags$input(id = "entrada_minima",
+                           type = "number",
+                           value = 0,
+                           style = "pointer-events: none;  border: none;")
+         ),
        )
       ), #Fin del div prestamo
       #DIV de pago hipoteca      
@@ -396,11 +401,13 @@ server <- function(input, output, session) {
     fecha_inicial <- input$fecha_inicial
     ingresos<-input$ingresos
     deudas<-input$deudas
-    entrada<-input$entrada;entrada_minima<-input$entrada_minima
+    entrada<-input$entrada
+    entrada_minima<-input$entrada_minima
     
     
     tabla_amortizacion<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
     tabla_roi<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
+
     html_resultados<-inversion::recolecta_datos_de_resultado(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deudas,entrada,entrada_minima)
   })  
   
@@ -415,7 +422,8 @@ server <- function(input, output, session) {
     fecha_inicial <- input$fecha_inicial
     ingresos<-input$ingresos
     deudas<-input$deudas
-    entrada<-input$entrada;entrada_minima<-input$entrada_minima
+    entrada<-input$entrada
+    entrada_minima<-input$entrada_minima
     
     tabla_amortizacion<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
     tabla_roi<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
@@ -452,7 +460,8 @@ server <- function(input, output, session) {
     plazo_meses <- input$plazo_meses
     plazo_anios <- input$plazo
     fecha_inicial <- input$fecha_inicial
-    entrada<-input$entrada;entrada_minima<-input$entrada_minima
+    entrada<-input$entrada
+    entrada_minima<-input$entrada_minima
     
     tasa_mensual <- input$tasa / 100 / 12
     
@@ -500,7 +509,8 @@ server <- function(input, output, session) {
     plazo_meses <- input$plazo_meses
     plazo_anios <- input$plazo
     fecha_inicial <- input$fecha_inicial
-    entrada<-input$entrada;entrada_minima<-input$entrada_minima
+    entrada<-input$entrada
+    entrada_minima<-input$entrada_minima
     
     tasa_mensual <- input$tasa / 100 / 12 
     nuevo_tiempo <- log(cuota / (cuota - prestamo * tasa_mensual)) / log(1 + tasa_mensual)
@@ -547,11 +557,16 @@ server <- function(input, output, session) {
     gastos_hipotecarios<-input$gastos_hipotecarios
     comisiones<-input$comisiones
     precio_venta<-input$precio_venta
+    entrada<-input$entrada
+    entrada_minima<-input$entrada_minima
     
     tasa<-input$tasa
     cuota<-input$cuota
     prestamo<-input$prestamo
+    plazo<-input$plazo
     plazo_meses<-input$plazo_meses
+    plazo_ingresos<-input$plazo_ingresos
+    plazo_meses_ingresos<-input$plazo_meses_ingresos
     fecha_inicial<-input$fecha_inicial
     
     maxima_hipoteca <-input$maxima_hipoteca
@@ -559,13 +574,14 @@ server <- function(input, output, session) {
     ingresos<-input$ingresos
     deudas<-input$deudas
     
-    nueva_entrada <-round(calcular_entrada (tasacion, gastos_hipotecarios, comisiones,precio_venta,maxima_hipoteca),0)
-    updateNumericInput(session, "entrada_minima", value = nueva_entrada)
-    entrada_minima <- nueva_entrada
+    entrada_minima <-round(calcular_entrada (tasacion, gastos_hipotecarios, comisiones,precio_venta,maxima_hipoteca),0)
+    updateNumericInput(session, "entrada_minima", value = entrada_minima)
+    
     
     tabla_amortizacion<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
     tabla_roi<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
-    html_resultados<-inversion::recolecta_datos_de_resultado(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deudas, entrada_minima)
+
+    html_resultados<-inversion::recolecta_datos_de_resultado(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deudas,entrada, entrada_minima)
     
     #salida de resultados tabla amortizacion
     # Mostrar la tabla HTML en la salida
@@ -580,12 +596,20 @@ server <- function(input, output, session) {
   
   #Estas funciones actualizan los plazos de los campos aC1o y meses para que siempre este igual
   observeEvent(input$plazo, {
-    # Actualizar el valor de "Plazo (meses)" al modificar "Plazo (aC1os)"
-    updateNumericInput(session, "plazo_meses", value = input$plazo * 12)
+    # Actualizar el valor de "Plazo (meses)" al modificar "Plazo (años)"
+    updateNumericInput(session, "plazo_meses", value = round(input$plazo * 12,0))
   })
   observeEvent(input$plazo_meses, {
-    # Actualizar el valor de "Plazo (aC1os)" al modificar "Plazo (meses)"
-    updateNumericInput(session, "plazo", value = input$plazo_meses / 12)
+    # Actualizar el valor de "Plazo (años)" al modificar "Plazo (meses)"
+    updateNumericInput(session, "plazo", value = round(input$plazo_meses / 12,1))
+  })
+  observeEvent(input$plazo_ingresos, {
+    # Actualizar el valor de "Plazo (meses)" al modificar "Plazo (años)"
+    updateNumericInput(session, "plazo_meses_ingresos", value = round(input$plazo_ingresos * 12,0))
+  })
+  observeEvent(input$plazo_meses_ingresos, {
+    # Actualizar el valor de "Plazo (años)" al modificar "Plazo (meses)"
+    updateNumericInput(session, "plazo_ingresos", value = round(input$plazo_meses_ingresos / 12,1))
   })
   
   #Calculame el maximo prestamo segun mis ingresos, gastos, entrada, plazo e interes
@@ -593,7 +617,7 @@ server <- function(input, output, session) {
     ingresos<-input$ingresos
     deudas<-input$deudas
     tasa<-input$tasa
-    plazo_meses<-input$plazo*12
+    plazo_meses<-input$plazo_ingresos*12
     entrada<-input$entrada
     gastos_hipotecarios<-input$gastos_hipotecarios
     comisiones<-input$comisiones

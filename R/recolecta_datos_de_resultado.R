@@ -107,7 +107,7 @@ formatea_resultados<-function(tabla_resultado){
   
 
   # Revisa si la entrada que se da(entrada) es suficiente respecto el calculo de la entrada minima (entrada_minima)
-  if (tabla_resultado$Resultado[12] < tabla_resultado$Resultado[13]) {
+  if (tabla_resultado$Valor[12] < tabla_resultado$Valor[13]) {
     tabla_resultado$Resultado[12] <- "KO. Entrada minima necesaria"
     tabla_resultado$Resultado[13] <- "KO. Entrada minima necesaria"
   }  else{tabla_resultado$Resultado[12]<-"OK";tabla_resultado$Resultado[13]<-"OK"}
