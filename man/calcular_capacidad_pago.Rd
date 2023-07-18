@@ -15,12 +15,23 @@ calcular_capacidad_pago(
 )
 }
 \arguments{
-\item{comisiones}{}
+\item{ingresos}{earning monthly}
+
+\item{deudas}{Debt monthly}
+
+\item{tasa}{Anual tax}
+
+\item{plazo_meses}{mortgage term in months}
+
+\item{entrada}{Debt monthly}
+
+\item{gastos_hipotecarios}{#Son los de gestion}
+
+\item{comisiones}{#Comisiones bancarias}
+}
+\value{
+capacidad_pago #Devuelve la capacidad de pago
 }
 \description{
 monthly payment capacity
-}
-\examples{
-calcular_capacidad_pago(3000,500,4.2,300,15000,7.5,7.5)
-#262500
 }

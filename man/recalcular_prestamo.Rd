@@ -2,7 +2,7 @@
 % Please edit documentation in R/recalcular_prestamo.R
 \name{recalcular_prestamo}
 \alias{recalcular_prestamo}
-\title{Title}
+\title{Title Funci??n para recalcular el prestamo en funcion del precio de venta, comisiones..etc..}
 \usage{
 recalcular_prestamo(
   tasacion,
@@ -13,8 +13,22 @@ recalcular_prestamo(
 )
 }
 \arguments{
-\item{precio_venta}{}
+\item{tasacion}{#tasacion}
+
+\item{entrada}{#entrada}
+
+\item{gastos_hipotecarios}{#gastos_hipotecarios}
+
+\item{comisiones}{#comisiones}
+
+\item{precio_venta}{#precio_venta}
+}
+\value{
+prestamo #Devuelve el calor del prestamo necesario
 }
 \description{
-Title
+Title Funci??n para recalcular el prestamo en funcion del precio de venta, comisiones..etc..
+}
+\examples{
+recalcular_prestamo (200000,45000,7,7,18000)
 }

@@ -1,7 +1,8 @@
 Package: inversion
 Type: Package
+Language: es
 Title: Real Estate Management Tools for Mortgage Calculations, Financing, and Return on Investment (ROI) 
-Version: 0.1.0
+Version: 1.0.0
 Author: David Perez Martorell
 Maintainer: David Perez Martorell <davidperezmartorell@gmail.com>
 Description: Real Estate Management Tools for Mortgage Calculations, Financing, and Return on Investment (ROI) provide a comprehensive set of tools and resources to facilitate the management of real estate properties, particularly in the areas of mortgage calculations, financing options, and assessing the return on investment.
@@ -11,13 +12,8 @@ Description: Real Estate Management Tools for Mortgage Calculations, Financing, 
   Overall, these real estate management tools serve as valuable resources for individuals and professionals involved in the real estate industry. By providing robust calculations, financing insights, and ROI analysis, they empower users to make informed decisions, optimize their financial strategies, and maximize the potential returns on their real estate investments.
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
 Imports:
-  shiny,
-  shinyBS,
-  shinydashboard,
   lubridate,
-  tibble,
   knitr,
   kableExtra,
   magrittr

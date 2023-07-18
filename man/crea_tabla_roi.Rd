@@ -27,5 +27,4 @@ Create ROI table
 \dontrun{
 crea_tabla_roi(4.2,1200,300,200000,"2024-12-31")
 }
-
 }

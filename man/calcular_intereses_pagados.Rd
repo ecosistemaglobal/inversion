@@ -17,19 +17,11 @@ calcular_intereses_pagados(tasa, cuota, prestamo, plazo_meses, fecha_inicial)
 \item{plazo_meses}{mortgage term in months}
 
 \item{fecha_inicial}{Start of mortgage}
-
-\item{tasacion}{Value of the building, flat, house}
 }
 \value{
-Return interest to be paid over the entire mortgag
+intereses_pagados Return interest to be paid over the entire mortgag
 }
 \description{
 Calcula los intereses que se van a pagar durante toda la hipoteca
 Calculate the interest to be paid over the entire mortgage.
-}
-\examples{
-\dontrun{
-recolecta_datos_de_resultado(4.2,1200,200000,300,"2024-12-31")
-}
-
 }

@@ -2,8 +2,7 @@
 % Please edit documentation in R/recolecta_datos_de_resultado.R
 \name{recolecta_datos_de_resultado}
 \alias{recolecta_datos_de_resultado}
-\title{Recopila los datos mas importantes y lo devuelve en formato HTML con colores
-Create output result with all the core values}
+\title{Tittle Create output result with all the core values}
 \usage{
 recolecta_datos_de_resultado(
   tasacion,
@@ -13,7 +12,9 @@ recolecta_datos_de_resultado(
   plazo_meses,
   fecha_inicial,
   ingresos,
-  deuda
+  deuda,
+  entrada,
+  entrada_minima
 )
 }
 \arguments{
@@ -25,28 +26,36 @@ recolecta_datos_de_resultado(
 
 \item{prestamo}{Import mortgage loan (prestamo)}
 
-\item{plazo_meses}{mortgage term in months}
+\item{plazo_meses}{Mortgage term in months}
 
 \item{fecha_inicial}{Start of mortgage}
 
-\item{ingresos}{earning monthly}
+\item{ingresos}{Earning monthly}
 
 \item{deuda}{Debt monthly}
 
-\item{deuda_final}{Final value of all the mortgage}
+\item{entrada}{Down payment contributed to cover initial expenses and 90 per 100 of the sale price.}
 
-\item{intereses_pagados}{All the interests to pay during all the mortgage}
+\item{entrada_minima}{Minimum Down payment contributed to cover initial expenses}
 }
 \value{
-Return table with amortizacion. there are 5 columns
+tabla_resultado Return table with amortizacion. There are 5 columns
 }
 \description{
-Recopila los datos mas importantes y lo devuelve en formato HTML con colores
-Create output result with all the core values
+Tittle Create output result with all the core values
 }
 \examples{
-\dontrun{
-recolecta_datos_de_resultado(180000,4.2,1200,200000,300,"2024-12-31",4000,500)
-}
+tasacion <- 200000
+tasa <- 90
+cuota <- 1500
+prestamo <- 180000
+plazo_meses <- 360
+fecha_inicial <- as.Date("2023-01-01")
+ingresos <- 3000
+deuda <- 500
+entrada <- 15000
+entrada_minima <- 50000
+recolecta_datos_de_resultado(tasacion, tasa, cuota, prestamo, plazo_meses, fecha_inicial, 
+      ingresos, deuda, entrada, entrada_minima)
 
 }

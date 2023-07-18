@@ -1,49 +1,54 @@
-#' Recopila los datos mas importantes y lo devuelve en formato HTML con colores
-#' Create output result with all the core values
+#' Tittle Create output result with all the core values
 #'
-#' @param tasacion  Value of the building, flat, house
-#' @param tasa  Anual tax
+#' @param tasacion Value of the building, flat, house
+#' @param tasa Anual tax
 #' @param cuota Monthly quota to pay
 #' @param prestamo Import mortgage loan (prestamo)
-#' @param plazo_meses mortgage term in months
+#' @param plazo_meses Mortgage term in months
 #' @param fecha_inicial Start of mortgage
-#' @param ingresos earning monthly
+#' @param ingresos Earning monthly
 #' @param deuda Debt monthly
-#' @param entrada Down payment contributed to cover initial expenses and 90% of the sale price.
-#' @param entrada_minima Minimum apportation to be abble to have the mortgage accorging earning and debt
-#' @param deuda_final Final value of all the mortgage
-#' @param intereses_pagados All the interests to pay during all the mortgage
-#' @return Return table with amortizacion. there are 5 columns
-#' @export
+#' @param entrada Down payment contributed to cover initial expenses and 90 per 100 of the sale price.
+#' @param entrada_minima Minimum Down payment contributed to cover initial expenses
+#'
+#' @return tabla_resultado Return table with amortizacion. There are 5 columns
 #'
 #' @examples
-# recolecta_datos_de_resultado(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deuda,entrada,entrada_minima)
-#' \dontrun{
-#' recolecta_datos_de_resultado(180000,4.2,1200,200000,300,"2024-12-31",4000,500,15000,0)
-#' }
+#' tasacion <- 200000
+#' tasa <- 90
+#' cuota <- 1500
+#' prestamo <- 180000
+#' plazo_meses <- 360
+#' fecha_inicial <- as.Date("2023-01-01")
+#' ingresos <- 3000
+#' deuda <- 500
+#' entrada <- 15000
+#' entrada_minima <- 50000
+#' recolecta_datos_de_resultado(tasacion, tasa, cuota, prestamo, plazo_meses, fecha_inicial, 
+#'       ingresos, deuda, entrada, entrada_minima)
 #'
-# Salida con datos generales respecto hipoteca
+#' @export
 recolecta_datos_de_resultado <- function(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deuda,entrada,entrada_minima) {
   tasacion <- tasacion
   tasa <- tasa
   tasa_mensual <- tasa / 100 / 12
-  cuota_mensual <- cuota
+  cuota <- cuota
   prestamo <- prestamo
   plazo_meses <- plazo_meses
   fecha_inicial <- fecha_inicial
   ingresos <- ingresos
   deuda <- deuda
   entrada <- entrada
-  entrada_minima <- entrada_minima
+  entrada_minima<-entrada_minima
   deuda_final <- round(inversion::calcular_deuda_final(tasa, cuota, prestamo, plazo_meses, fecha_inicial),2)
   intereses_pagados<- round(inversion::calcular_intereses_pagados(tasa, cuota, prestamo, plazo_meses, fecha_inicial),2)
 
   tabla_resultado <- data.frame(
-    Descripcion = c("Tasación","Préstamo", "Interés anual", "Inicio de la hipoteca", "Meses necesarios para cancelar la hipoteca",
-                    "Años necesarios para cancelar la hipoteca", "Cuota mensual a pagar", "Deuda al final de la hipoteca",
+    Descripcion = c("Tasacion","Prestamo", "Interes anual", "Inicio de la hipoteca", "Meses necesarios para cancelar la hipoteca",
+                    "Tiempo anual necesario para cancelar la hipoteca", "Cuota mensual a pagar", "Deuda al final de la hipoteca",
                     "Ingresos", "Deuda", "Intereses pagados", "Entrada", "Entrada minima"),
     Valor = c(as.character(tasacion),as.character(prestamo), as.character(tasa), as.character(fecha_inicial),
-              as.character(plazo_meses), as.character(round(plazo_meses/12, 2)), as.character(cuota_mensual),
+              as.character(plazo_meses), as.character(round(plazo_meses/12, 2)), as.character(cuota),
               as.character(deuda_final),as.character(ingresos),as.character(deuda),as.character(intereses_pagados),as.character(entrada),as.character(entrada_minima)),
     Resultado = c("OK","OK", "OK", "OK", "OK", "OK", "OK", "OK", "OK", "OK", "OK", "OK", "OK")
   )
@@ -57,7 +62,7 @@ recolecta_datos_de_resultado <- function(tasacion,tasa,cuota,prestamo,plazo_mese
   tabla_html <- knitr::kable(html_resultados, format = "html") %>%  kableExtra::kable_styling()
   # Aplicar estilo CSS para resaltar filas con Col2 igual a 2
   html_table_resultados2 <- tabla_html %>%
-    row_spec(which(html_resultados$Resultado != "OK"), color = "red")
+    kableExtra::row_spec(which(html_resultados$Resultado != "OK"), color = "red")
   return(html_table_resultados2)
 }
 
@@ -77,7 +82,7 @@ formatea_resultados<-function(tabla_resultado){
   else
   {tabla_resultado$Valor[8]=0;tabla_resultado$Resultado[8]="OK"}
 
-  # Modifica casilla de tasacion en caso que el prestamo sea mayor al 90% de la tasacion
+  # Modifica casilla de tasacion en caso que el prestamo sea mayor al 90 por 100 de la tasacion
   tasacion<-as.numeric(tabla_resultado$Valor[1])
   prestamo<-as.numeric(tabla_resultado$Valor[2])
   if (length(tasacion) > 0 && ((prestamo*100)/tasacion) > 90) {
@@ -88,8 +93,8 @@ formatea_resultados<-function(tabla_resultado){
   meses<-as.numeric(tabla_resultado$Valor[5])
 
   if (meses > 360) {
-    tabla_resultado$Resultado[5] <- "KO. El pr??stamo tiene una duraci??n muy larga"
-    tabla_resultado$Resultado[6] <- "KO. El pr??stamo tiene una duraci??n muy larga"
+    tabla_resultado$Resultado[5] <- "KO. El prestamo tiene una duracion muy larga"
+    tabla_resultado$Resultado[6] <- "KO. El prestamo tiene una duracion muy larga"
   }  else{tabla_resultado$Resultado[5]<-"OK";tabla_resultado$Resultado[6]<-"OK"}
 
   #Revisa si la cuota a pagar es menor al 33% de los ingresos limpios

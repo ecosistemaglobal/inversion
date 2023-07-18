@@ -1,4 +1,3 @@
-library(lubridate) #Para hacer calculos de fechas
 # Calculo del tiempo necesario para roi
 #' Create ROI table
 #'
@@ -16,7 +15,6 @@ library(lubridate) #Para hacer calculos de fechas
 #' \dontrun{
 #' crea_tabla_roi(4.2,1200,300,200000,"2024-12-31")
 #' }
-#'
 crea_tabla_roi <- function(tasa,cuota,prestamo,plazo_meses,fecha_inicial) {
   #Dataframe para poner la tabla de amortizacion
   tabla_resultado_roi <- data.frame(
@@ -25,16 +23,16 @@ crea_tabla_roi <- function(tasa,cuota,prestamo,plazo_meses,fecha_inicial) {
     Valor = c("pendiente", "pendiente", "pendiente","pendiente", "pendiente", "pendiente","pendiente"),
     Resultado = c("pendiente", "pendiente", "pendiente","pendiente", "pendiente", "pendiente","pendiente")
   )
-  browser()
-
   tasa <- tasa
   tasa_mensual <- tasa / 100 / 12
   cuota_mensual <- cuota
   prestamo <- prestamo
   plazo_meses <- plazo_meses
+  
   fecha_inicial <- fecha_inicial <- as.Date(fecha_inicial, format = "%Y-%m-%d")
   # Crear tabla de amortizacion
-  fechas <- seq(fecha_inicial %m+% months(1), by = "months", length.out = plazo_meses)
+  fecha_inicial<-lubridate::date(fecha_inicial)
+  fechas <- seq(lubridate::`%m+%`(fecha_inicial, months(1)), by = "months", length.out = plazo_meses)
   fechas <- format(fechas, "%d-%m-%Y")
   cuotas <- rep(cuota_mensual, plazo_meses)
 

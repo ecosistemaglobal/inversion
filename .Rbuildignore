@@ -3,3 +3,4 @@
 ^inversion\.Rcheck$
 ^inversion.*\.tar\.gz$
 ^inversion.*\.tgz$
+^cran-comments\.md$

@@ -1,26 +1,23 @@
-# Obtener el dataframe en formato HTML
-library(knitr);library(kableExtra); library(magrittr)
-
-
-# Calcula beneficions en funcion de los gastos y ingresos de un alquiler
 #' Calculate profits based on the expenses and income from a rental
 #'
-#' @param gastos_alquiler #Annual expenses
-#' @param mantenimientos_alquiler #Annual expenses
-#' @param ingresos_alquiler #Annual earnings
+#' @param gastos_alquiler Annual expenses
+#' @param mantenimientos_alquiler Annual expenses
+#' @param ingresos_alquiler Annual earnings
 #'
 #' @return Return table with all the information and final profit
 #' @export
+#'
 #' @examples
-#' gastos_alquiler <-1000
+#' gastos_alquiler <- 1000
 #' mantenimientos_alquiler <- 1000
-#' ingresos_alquiler <-15000
-#' \usage{
-#'   recolecta_datos_de_alquiler(gastos_alquiler,mantenimientos_alquiler,ingresos_alquiler)
-#' }
-#' recolecta_datos_de_alquiler(1000,1000,15000)
+#' ingresos_alquiler <- 15000
+#' recolecta_datos_de_alquiler(gastos_alquiler, mantenimientos_alquiler, ingresos_alquiler)
 #' # Output: 1083.33
-recolecta_datos_de_alquiler <- function(gastos_alquiler,mantenimientos_alquiler,ingresos_alquiler){
+#'
+#' @import knitr
+#' @import kableExtra
+#' @import magrittr
+recolecta_datos_de_alquiler <- function(gastos_alquiler, mantenimientos_alquiler, ingresos_alquiler) {
   gastos_alquiler <- gastos_alquiler
   mantenimientos_alquiler <- mantenimientos_alquiler
   ingresos_alquiler <- ingresos_alquiler

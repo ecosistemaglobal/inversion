@@ -17,8 +17,6 @@ calcular_deuda_final(tasa, cuota, prestamo, plazo_meses, fecha_inicial)
 \item{plazo_meses}{mortgage term in months}
 
 \item{fecha_inicial}{Start of mortgage}
-
-\item{tasacion}{Value of the building, flat, house}
 }
 \value{
 Return total cost of the mortgage

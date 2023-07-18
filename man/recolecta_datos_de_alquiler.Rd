@@ -11,11 +11,11 @@ recolecta_datos_de_alquiler(
 )
 }
 \arguments{
-\item{gastos_alquiler}{#Annual expenses}
+\item{gastos_alquiler}{Annual expenses}
 
-\item{mantenimientos_alquiler}{#Annual expenses}
+\item{mantenimientos_alquiler}{Annual expenses}
 
-\item{ingresos_alquiler}{#Annual earnings}
+\item{ingresos_alquiler}{Annual earnings}
 }
 \value{
 Return table with all the information and final profit
@@ -24,12 +24,10 @@ Return table with all the information and final profit
 Calculate profits based on the expenses and income from a rental
 }
 \examples{
-gastos_alquiler <-1000
+gastos_alquiler <- 1000
 mantenimientos_alquiler <- 1000
-ingresos_alquiler <-15000
-\usage{
-  recolecta_datos_de_alquiler(gastos_alquiler,mantenimientos_alquiler,ingresos_alquiler)
-}
-recolecta_datos_de_alquiler(1000,1000,15000)
+ingresos_alquiler <- 15000
+recolecta_datos_de_alquiler(gastos_alquiler, mantenimientos_alquiler, ingresos_alquiler)
 # Output: 1083.33
+
 }

@@ -47,7 +47,8 @@ crea_tabla_amortizacion <- function(tasa,cuota,prestamo,plazo_meses,fecha_inicia
   plazo_meses <- plazo_meses
   fecha_inicial <- fecha_inicial <- as.Date(fecha_inicial, format = "%d-%m-%Y")
   # Crear tabla de amortizacion
-  fechas <- seq(fecha_inicial %m+% months(1), by = "months", length.out = plazo_meses)
+  fecha_inicial<-lubridate::date(fecha_inicial)
+  fechas <- seq(lubridate::`%m+%`(fecha_inicial, months(1)), by = "months", length.out = plazo_meses)
   fechas <- format(fechas, "%d-%m-%Y")
   cuotas <- rep(cuota_mensual, plazo_meses)
 

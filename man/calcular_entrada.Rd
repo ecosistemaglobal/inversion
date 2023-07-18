@@ -13,8 +13,23 @@ calcular_entrada(
 )
 }
 \arguments{
-\item{maxima_hipoteca}{}
+\item{tasacion}{Value of the building, flat, house}
+
+\item{gastos_hipotecarios}{#Gastos hipotecarios}
+
+\item{comisiones}{#Comisiones de gestores}
+
+\item{precio_venta}{#Precio de venta}
+
+\item{maxima_hipoteca}{#hipoteca maxima}
+}
+\value{
+entrada Cantidad de dinero a aportar como entrada
 }
 \description{
 calcular_entrada
+}
+\examples{
+#calcular_entrada (tasacion, gastos_hipotecarios, comisiones,precio_venta,maxima_hipoteca)
+calcular_entrada (200000, 7, 7,180000,90)
 }

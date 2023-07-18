@@ -1,20 +1,17 @@
 # Funci??n para calcular la capacidad de pago mensual
 #' monthly payment capacity
 #'
-#' @param ingresos
-#' @param deudas
-#' @param tasa
-#' @param plazo_meses
-#' @param entrada
-#' @param gastos_hipotecarios
-#' @param comisiones
-#'
-#' @return
+#' @param ingresos earning monthly
+#' @param deudas Debt monthly
+#' @param tasa  Anual tax
+#' @param plazo_meses mortgage term in months
+#' @param entrada Debt monthly
+#' @param gastos_hipotecarios #Son los de gestion
+#' @param comisiones #Comisiones bancarias
+#' 
+#' @return capacidad_pago #Devuelve la capacidad de pago
 #' @export
 #'
-#' @examples
-#' calcular_capacidad_pago(3000,500,4.2,300,15000,7.5,7.5)
-#' #262500
 calcular_capacidad_pago <- function(ingresos, deudas, tasa, plazo_meses, entrada, gastos_hipotecarios, comisiones) {
   tasa_mensual <- (tasa / 12)  # ConversiC3n de tasa anual a mensual
   ingresos_disponibles <- ingresos - deudas
