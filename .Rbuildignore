@@ -4,3 +4,4 @@
 ^inversion.*\.tar\.gz$
 ^inversion.*\.tgz$
 ^cran-comments\.md$
+^CRAN-SUBMISSION$
