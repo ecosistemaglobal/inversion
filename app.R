@@ -1,76 +1,94 @@
 library(shiny) #Libreria shiny para funciones generales
-library(shinyBS) #Para poder trabajar con funciones especiales de shiny como agregar popupscon comentarios
-library(shinydashboard) #Para poder agregar iconos
-library(tibble)
-library(lubridate) #Para hacer calculos de fechas
-library(devtools) #Esto es para cargar el paquete que aun esta en GITHUB
-#devtools::install_github("ecosistemaglobal/inversion")
-library(inversion) #Este es el paquete que he creado con todas las funciones para calcular la inversion
-library("jsonlite")
-library("httr")
-library("data.table")
-library("RJDBC") #para leer MDB
+ library(shinyBS) #Para poder trabajar con funciones especiales de shiny como agregar popupscon comentarios
+ library(shinydashboard) #Para poder agregar iconos
+ library(tibble)
+ library(lubridate) #Para hacer calculos de fechas
+ library(devtools) #Esto es para cargar el paquete que aun esta en GITHUB
+ #devtools::install_github("ecosistemaglobal/inversion")
+ #library(inversion) #Este es el paquete que he creado con todas las funciones para calcular la inversion
+ library("jsonlite")
+ library("httr")
+ library("data.table")
+ library("RJDBC") #para leer MDB
+
 #Datos de regiones, provincias, localidades de  CNIG
-#http://centrodedescargas.cnig.es/CentroDescargas/catalogo.do?Serie=CAANE#:~:text=Nomencl%C3%A1tor%20Geogr%C3%A1fico%20B%C3%A1sico%20de%20Espa%C3%B1a%20Descripci%C3%B3n%3A%20relaci%C3%B3n%20de,y%20latitud%20y%20UTM%20en%20su%20huso%20correspondiente.
+ #http://centrodedescargas.cnig.es/CentroDescargas/catalogo.do?Serie=CAANE#:~:text=Nomencl%C3%A1tor%20Geogr%C3%A1fico%20B%C3%A1sico%20de%20Espa%C3%B1a%20Descripci%C3%B3n%3A%20relaci%C3%B3n%20de,y%20latitud%20y%20UTM%20en%20su%20huso%20correspondiente.
+
 #title: "Idealista_API"
-#output: html_notebook
-#Author: Antonio Martin-Cobos | Data Analytics Manager
-#References
-#https://www.r-bloggers.com/2018/10/converting-nested-json-to-a-tidy-data-frame-with-r/
-library("tidyverse")
-library("shiny")
-library("leaflet")
-library("osmdata")
-#Inicializa BBDD
-library(RSQLite) #PAra trabajar con una base de datos
-library("dotenv") #para proteccion archivo con contrseña de Idealiasta
-library("kableExtra") #Para dar formato html a la salida de resultados
-library("DT")  #Para poder ordenar la tabla de salida de inmuebles de Idealista
+ #output: html_notebook
+ #Author: Antonio Martin-Cobos | Data Analytics Manager
+ #References
+ #https://www.r-bloggers.com/2018/10/converting-nested-json-to-a-tidy-data-frame-with-r/
+ library("tidyverse")
+ library("shiny")
+ library("leaflet")
+ library("osmdata")
 
-# Carga de catos de regiones, provincias y municipios
-    #chequeo si existe la BBDD
-        dbname <- "idealistaBBDD.sqlite"
-        if (file.exists(dbname)) {
-          # Si el archivo existe, simplemente cargar la base de datos
-          con <- dbConnect(RSQLite::SQLite(), dbname)
-        } else {
-          # Si el archivo no existe, crear una nueva conexión y cargar los datos desde los archivos
-            dbname <- "idealistaBBDD.sqlite"
-            # Crea una conexión a la base de datos (esto también creará la base de datos si no existe)
-            con <- dbConnect(RSQLite::SQLite(), dbname)
-            #Llama a funcion para cargar localidades solo si la BBDD esta vacia
-                  
-                  # Comprobar si la tabla "provincias" está vacía
-                  query <- "SELECT COUNT(*) FROM provincias"
-                  num_registros_provincias <- dbGetQuery(con, query)
-                  
-                  # Comprobar si la tabla "municipios" está vacía
-                  query <- "SELECT COUNT(*) FROM municipios"
-                  num_registros_municipios <- dbGetQuery(con, query)
-                  
-                  # Ejecutar carga_datos_localidades si ambas tablas están vacías
-                  if (num_registros_provincias == 0 && num_registros_municipios == 0) {
-                      # Cargar datos de provincias y municipios (supongamos que tienes los marcos de datos)
-                      provincias <- read.csv("./PROVINCIAS.csv", sep = ";", encoding = "UTF-8")
-                      municipios <- read.csv("./MUNICIPIOS.csv", sep = ";", encoding = "UTF-8")
-                      # Escribir datos de provincias en la base de datos
-                      dbWriteTable(con, "provincias", provincias, overwrite = TRUE)
-                      # Escribir datos de municipios en la base de datos
-                      dbWriteTable(con, "municipios", municipios, overwrite = TRUE)
-                  }
-          }
-        #Selecciona los datos de la base de atos
-        query <- "SELECT * FROM provincias"
-        provincias <- dbGetQuery(con, query)
-        query <- "SELECT * FROM municipios"
-        municipios <- dbGetQuery(con, query)
-        dbDisconnect(con)
-        
+ library("kableExtra") #Para dar formato html a la salida de resultados
+ library("DT")  #Para poder ordenar la tabla de salida de inmuebles de Idealista
+
+ 
+#' carga_bbdd_inmuebles <- function() {
+#'    #' Tittle Create output result with all the core values
+#'    #'
+#'    #' @param provincias Dataframe con datos de las provincias que ademas contiene las regiones
+#'    #' @param municipios Dataframe con datos de los municipios
+#'    #' @param idealista_data Datos de los inmuebles que se cargaron en el pasado de Idealista. BBDD interna para explotacion de historico
+#'    #'
+#'    #' @return c(provincias, municipios,idealista_data))Return 3 tables with provincias, municipios and idealista_data
+#'    #'
+#'    #' @examples
+#'    #' carga_bbdd_inmuebles()
+#'    #'
+#'    #' @export
+#'    #' 
+#'    #' 
+#'    #' 
+#'    #' 
+#'    #' #Inicializa BBDD
+#'    library("RSQLite") #PAra trabajar con una base de datos
+#'    library("dotenv") #para proteccion archivo con contrseña de Idealiasta
+#'    # Carga de catos de regiones, provincias y municipios
+#'    #chequeo si existe la BBDD
+#'    dbname <- "../inst/idealistaBBDD.sqlite"
+#'    # Si el archivo no existe, crear una nueva conexión y cargar los datos desde los archivos        
+#'    if (file.exists(dbname)) {
+#'      # Si el archivo existe, simplemente cargar la base de datos
+#'      con <- dbConnect(RSQLite::SQLite(), dbname)
+#'    } else 
+#'    {
+#'      # Si el archivo no existe, crear una nueva conexión y cargar los datos desde los archivos
+#'      dbname <- "idealistaBBDD.sqlite"
+#'      # Crea una conexión a la base de datos (esto también creará la base de datos si no existe)
+#'      con <- dbConnect(RSQLite::SQLite(), dbname)
+#'      # Cargar datos de provincias y municipios (supongamos que tienes los marcos de datos)
+#'      provincias <- read.csv("../inst/PROVINCIAS.csv", sep = ";", encoding = "UTF-8")
+#'      municipios <- read.csv("../inst/MUNICIPIOS.csv", sep = ";", encoding = "UTF-8")
+#'      # Escribir datos de provincias en la base de datos
+#'      dbWriteTable(con, "provincias", provincias, overwrite = TRUE)
+#'      # Escribir datos de municipios en la base de datos
+#'      dbWriteTable(con, "municipios", municipios, overwrite = TRUE)
+#'    }
+#'    
+#'    #Selecciona los datos de la base de datos
+#'    query <- "SELECT * FROM provincias"
+#'    provincias <- dbGetQuery(con, query)
+#'    query <- "SELECT * FROM municipios"
+#'    municipios <- dbGetQuery(con, query)
+#'    query <- "SELECT * FROM idealista_data"
+#'    idealista_data <- dbGetQuery(con, query)
+#'    return(list(provincias, municipios, idealista_data))
+#'    dbDisconnect(con)
+#'  }
+ 
+#Carga la BBD de inmuebles
+
+consulta_sql <- carga_bbdd_inmuebles()
+provincias <- consulta_sql[1]
+municipios <- consulta_sql[2]
+idealista_data <- consulta_sql[3]
 
 
-
-
-  
 #Variables iniciales
 Sys.setlocale(category = "LC_ALL", locale = "es_ES.UTF-8")
 
@@ -107,7 +125,7 @@ tabla_resultado <- data.frame(
 html_resultados <- knitr::kable(tabla_resultado, format = "html")
 
 #Dataframe con datos de alquiler iniciales
-tabla_alquiler<- data.frame(
+tabla_alquiler <- data.frame(
   Descripcion = c("Gastos anuales","Mantenimientos", "Ingresos", "Rentabilidad total", "Rentabilidad mensual"),
   Valor = c("   ...   ","   ...   ","   ...   ","   ...   ","   ...   "),
   Resultado = c("   ...   ","   ...   ","   ...   ","   ...   ","   ...   ")
@@ -132,7 +150,8 @@ columnas_deseadas <- c(
 tabla_idealista_data <- data.frame(matrix(NA, ncol = length(columnas_deseadas), dimnames = list(NULL, columnas_deseadas)))
 
 
-moneda="euro"
+
+moneda = "euro"
 
 # Definimos una clase CSS personalizada para el sidebarMenu
 tags$head(
@@ -154,24 +173,24 @@ ui <- dashboardPage(
     sidebarMenu( 
       # #Inicio menu de IA-inversion
       menuItem("IA inversion", tabName = "IA-inversion",
-               fluidRow(class="menu-text",column(width = 12,
+               fluidRow(class = "menu-text",column(width = 12,
                    selectInput("region", "Selecciona una Región:", choices = unique(provincias$COMUNIDAD_AUTONOMA), selected = "Comunidad de Madrid"),
                    selectInput("provincia", "Selecciona una Provincia:", choices = NULL),
                    selectInput("municipio", "Selecciona un Municipio:", choices = NULL)
                )),
-               fluidRow(class="menu-text",column(width = 12,
+               fluidRow(class = "menu-text",column(width = 12,
                     selectInput("tipo_inmueble", "Tipo de inmueble:", choices = c("homes","offices", "local", "garages", "penthouse","flat","bedrooms")
                ))),
-               fluidRow(class="menu-text",column(width = 12,
+               fluidRow(class = "menu-text",column(width = 12,
                  selectInput("tipo_inversion", "Tipo de inmueble:", choices = c("sale", "rent")
                  ))),                        
-               fluidRow(class="menu-text",column(width = 12,
+               fluidRow(class = "menu-text",column(width = 12,
                   sliderInput("metros_inmueble", "Tamaño del inmueble:", min = 0, max = 500, value = c(10, 499))
                )),
-               fluidRow(class="menu-text",column(width = 12,
+               fluidRow(class = "menu-text",column(width = 12,
                sliderInput("precio_inmueble", "Precio del inmueble:", min = 0, max = 5000000, value = c(150000, 1000000)),
                )),
-              fluidRow(class="menu-text",
+              fluidRow(class = "menu-text",
                 column(width = 6,
                     tags$h6("Busca inmuebles"),
                     actionButton("boton_compra_alquiler", icon("calculator"),
@@ -188,15 +207,15 @@ ui <- dashboardPage(
       
       #Inicio Menu Capacidad de Pago
       menuItem("Capacidad de Pago", tabName = "menu_capacidad_pago",
-               fluidRow(class="menu-text",column(width = 12,
+               fluidRow(class = "menu-text",column(width = 12,
                    tags$h6("Entrada", title = "Entrada aportada para los gastos"),
                    numericInput("entrada", "", value = 15000))
                ),
-               fluidRow(class="menu-text",column(width = 12,
+               fluidRow(class = "menu-text",column(width = 12,
                    tags$h6("Ingresos", title = "Ingresos mensuales de los cuales solo se usará el 33%"),
                    numericInput("ingresos", "", value = 3300)),
                ),
-               fluidRow(class="menu-text",column(width = 12,
+               fluidRow(class = "menu-text",column(width = 12,
                    tags$h6("Deudas", title = "Deudas mensuales que restan a los ingresos"),
                    numericInput("deudas", "", value = 560)),
                ),
@@ -206,10 +225,10 @@ ui <- dashboardPage(
                                 title = "Calcula la capacidad de pago en función de los ingresos y los gastos")),
                     column(width = 8,numericInput("capacidad_de_pago", "", value = 0))
                ),
-               fluidRow(class="menu-text",
+               fluidRow(class = "menu-text",
                     column(width = 12,tags$h6("Plazo deseado (anual y mensual)", title = "Plazo en años que desea pagar la hipoteca")),
                ),
-               fluidRow(class="menu-text",
+               fluidRow(class = "menu-text",
                     column(width = 6,numericInput("plazo", "", value = 26)),
                     column(width = 6,numericInput("plazo_meses", "", value = 312))
                )
@@ -217,11 +236,11 @@ ui <- dashboardPage(
       
       # #Inicio menu de vivienda
       menuItem("Vivienda", tabName = "menu_vivienda",
-               fluidRow(class="menu-text",column(width = 12,
+               fluidRow(class = "menu-text",column(width = 12,
                    tags$h6("Precio venta", title = "Precio de venta del inmueble"),
                    numericInput("precio_venta", "", value = 180000))
                ),
-               fluidRow(class="menu-text",column(width = 12,
+               fluidRow(class = "menu-text",column(width = 12,
                    tags$h6("Tasación", title = "Tasación oficial o propuesta"),
                    numericInput("tasacion", "", value = 200000))
                )
@@ -230,11 +249,11 @@ ui <- dashboardPage(
 
       #Inicio del menu prestamo      
       menuItem("Prestamo", tabName = "menu_prestamo",
-               fluidRow(class="menu-text",column(width = 12,
+               fluidRow(class = "menu-text",column(width = 12,
                  tags$h6("Prestamo solicitado", title = "Prestamo solicitado"),
-                 numericInput("prestamo", "", value=180000))
+                 numericInput("prestamo", "", value = 180000))
                ),
-               fluidRow(class="menu-text",column(width = 12,
+               fluidRow(class = "menu-text",column(width = 12,
                  tags$h6("Fecha inicial", title = "Fecha inicial"),
                  dateInput("fecha_inicial", "", value = floor_date(Sys.Date(), "month")))
                ),
@@ -270,7 +289,7 @@ ui <- dashboardPage(
       
       # #Inicio menu de condiciones bancarias
       menuItem("Condiciones bancarias", tabName = "tabla_condiciones",
-               fluidRow(class="menu-text",column(width = 12,
+               fluidRow(class = "menu-text",column(width = 12,
                tags$h6("Años"),numericInput("plazo", "", value = 26),
                tags$h6("Meses"),numericInput("plazo_meses", "", value = 312))
                ),
@@ -348,13 +367,13 @@ server <- function(input, output, session) {
   
   #Recupera datos acerca la rentabilidad del alquiler
   observeEvent(input$calcular_rendimiento_alquiler,{
-    gastos_alquiler<-input$gastos_alquiler
-    mantenimientos_alquiler<-input$mantenimientos_alquiler
-    ingresos_alquiler<-input$ingresos_alquiler
-    datos_html_alquiler<-inversion::recolecta_datos_de_alquiler(gastos_alquiler,mantenimientos_alquiler,ingresos_alquiler)
+    gastos_alquiler <- input$gastos_alquiler
+    mantenimientos_alquiler <- input$mantenimientos_alquiler
+    ingresos_alquiler <- input$ingresos_alquiler
+    datos_html_alquiler <- inversion::recolecta_datos_de_alquiler(gastos_alquiler,mantenimientos_alquiler,ingresos_alquiler)
     #html_alquiler<-datos_html_alquiler[[1]] #esto es la tabla
     
-    html_alquiler<-paste0(datos_html_alquiler[[1]],datos_html_alquiler[[2]])
+    html_alquiler <- paste0(datos_html_alquiler[[1]],datos_html_alquiler[[2]])
     
     rentabilidad_alquiler <- as.integer(datos_html_alquiler[[2]][[1]]) #Rentabilidad alquiler
     updateNumericInput(session, "rentabilidad_alquiler", value = rentabilidad_alquiler)
@@ -389,8 +408,8 @@ server <- function(input, output, session) {
   observeEvent(c(input$entrada, input$gastos_hipotecarios, input$comisiones, input$precio_venta), {
     
     #Calculo del préstamo en funcion del precio del piso y los gastos
-    entrada<-input$entrada; gastos_hipotecarios<-input$gastos_hipotecarios; tasacion<-input$tasacion
-    comisiones<-input$comisiones; precio_venta<- input$precio_venta;
+    entrada <- input$entrada; gastos_hipotecarios <- input$gastos_hipotecarios; tasacion <- input$tasacion
+    comisiones <- input$comisiones; precio_venta <- input$precio_venta;
     
     nuevo_prestamo <- recalcular_prestamo(tasacion, entrada, gastos_hipotecarios, comisiones, precio_venta)
     updateNumericInput(session, "prestamo", value = nuevo_prestamo)
@@ -409,15 +428,15 @@ server <- function(input, output, session) {
     prestamo <- input$prestamo
     plazo_meses <- input$plazo_meses
     fecha_inicial <- input$fecha_inicial
-    ingresos<-input$ingresos
-    deudas<-input$deudas
-    entrada<-input$entrada
-    entrada_minima<-input$entrada_minima
+    ingresos <- input$ingresos
+    deudas <- input$deudas
+    entrada <- input$entrada
+    entrada_minima <- input$entrada_minima
     
-    tabla_amortizacion<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
-    tabla_roi<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
+    tabla_amortizacion <- inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
+    tabla_roi <- inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
     
-    html_resultados<-inversion::recolecta_datos_de_resultado(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deudas,entrada,entrada_minima)
+    html_resultados <- inversion::recolecta_datos_de_resultado(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deudas,entrada,entrada_minima)
   })  
   
   #Pulsamos boton calcular  
@@ -429,14 +448,14 @@ server <- function(input, output, session) {
     plazo_meses <- input$plazo_meses
     plazo_anios <- input$plazo
     fecha_inicial <- input$fecha_inicial
-    ingresos<-input$ingresos
-    deudas<-input$deudas
-    entrada<-input$entrada
-    entrada_minima<-input$entrada_minima
+    ingresos <- input$ingresos
+    deudas <- input$deudas
+    entrada <- input$entrada
+    entrada_minima <- input$entrada_minima
     
-    tabla_amortizacion<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
-    tabla_roi<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
-    html_resultados<-inversion::recolecta_datos_de_resultado(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deudas,entrada,entrada_minima)
+    tabla_amortizacion <- inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
+    tabla_roi <- inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
+    html_resultados <- inversion::recolecta_datos_de_resultado(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deudas,entrada,entrada_minima)
     
     #salida de resultados tabla amortizacion
     # Mostrar la tabla HTML en la salida
@@ -471,8 +490,8 @@ server <- function(input, output, session) {
     plazo_meses <- input$plazo_meses
     plazo_anios <- input$plazo
     fecha_inicial <- input$fecha_inicial
-    entrada<-input$entrada
-    entrada_minima<-input$entrada_minima
+    entrada <- input$entrada
+    entrada_minima <- input$entrada_minima
     
     tasa_mensual <- input$tasa / 100 / 12
     
@@ -481,12 +500,12 @@ server <- function(input, output, session) {
     
     # Actualizar el valor de la cuota en la interfaz
     updateNumericInput(session, "cuota", value = nueva_cuota)
-    cuota<-nueva_cuota
-    ingresos<-input$ingresos
-    deudas<-input$deudas
-    tabla_amortizacion<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
-    tabla_roi<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
-    html_resultados<-inversion::recolecta_datos_de_resultado(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deudas,entrada,entrada_minima)
+    cuota <- nueva_cuota
+    ingresos <- input$ingresos
+    deudas <- input$deudas
+    tabla_amortizacion <- inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
+    tabla_roi <- inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
+    html_resultados <- inversion::recolecta_datos_de_resultado(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deudas,entrada,entrada_minima)
     
     #salida de resultados tabla amortizacion
     # Mostrar la tabla HTML en la salida
@@ -521,24 +540,24 @@ server <- function(input, output, session) {
     plazo_meses <- input$plazo_meses
     plazo_anios <- input$plazo
     fecha_inicial <- input$fecha_inicial
-    entrada<-input$entrada
-    entrada_minima<-input$entrada_minima
+    entrada <- input$entrada
+    entrada_minima <- input$entrada_minima
     
     tasa_mensual <- input$tasa / 100 / 12 
     nuevo_tiempo <- log(cuota / (cuota - prestamo * tasa_mensual)) / log(1 + tasa_mensual)
     
-    nuevo_tiempo<-round(nuevo_tiempo,0)
+    nuevo_tiempo <- round(nuevo_tiempo,0)
     
     
     # Actualizar el valor de la cuota en la interfaz
     updateNumericInput(session, "plazo_meses", value = nuevo_tiempo)
-    plazo_meses<-nuevo_tiempo
-    ingresos<-input$ingresos
-    deudas<-input$deudas
+    plazo_meses <- nuevo_tiempo
+    ingresos <- input$ingresos
+    deudas <- input$deudas
     
-    tabla_amortizacion<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
-    tabla_roi<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
-    html_resultados<-inversion::recolecta_datos_de_resultado(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deudas,entrada,entrada_minima)
+    tabla_amortizacion <- inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
+    tabla_roi <- inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
+    html_resultados <- inversion::recolecta_datos_de_resultado(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deudas,entrada,entrada_minima)
     
     #salida de resultados tabla amortizacion
     # Mostrar la tabla HTML en la salida
@@ -566,35 +585,35 @@ server <- function(input, output, session) {
   
   #Para calcular la entada automaticamente
   observeEvent(input$boton_calcular_entrada,{
-    tasacion<-input$tasacion
-    gastos_hipotecarios<-input$gastos_hipotecarios
-    comisiones<-input$comisiones
-    precio_venta<-input$precio_venta
-    entrada<-input$entrada
-    entrada_minima<-input$entrada_minima
+    tasacion <- input$tasacion
+    gastos_hipotecarios <- input$gastos_hipotecarios
+    comisiones <- input$comisiones
+    precio_venta <- input$precio_venta
+    entrada <- input$entrada
+    entrada_minima <- input$entrada_minima
     
-    tasa<-input$tasa
-    cuota<-input$cuota
-    prestamo<-input$prestamo
-    plazo<-input$plazo
-    plazo_meses<-input$plazo_meses
-    plazo_ingresos<-input$plazo_ingresos
-    plazo_meses_ingresos<-input$plazo_meses_ingresos
-    fecha_inicial<-input$fecha_inicial
+    tasa <- input$tasa
+    cuota <- input$cuota
+    prestamo <- input$prestamo
+    plazo <- input$plazo
+    plazo_meses <- input$plazo_meses
+    plazo_ingresos <- input$plazo_ingresos
+    plazo_meses_ingresos <- input$plazo_meses_ingresos
+    fecha_inicial <- input$fecha_inicial
     
-    maxima_hipoteca <-input$maxima_hipoteca
+    maxima_hipoteca  <- input$maxima_hipoteca
     
-    ingresos<-input$ingresos
-    deudas<-input$deudas
+    ingresos <- input$ingresos
+    deudas <- input$deudas
     
-    entrada_minima <-round(calcular_entrada (tasacion, gastos_hipotecarios, comisiones,precio_venta,maxima_hipoteca),0)
+    entrada_minima <- round(calcular_entrada(tasacion, gastos_hipotecarios, comisiones,precio_venta,maxima_hipoteca),0)
     updateNumericInput(session, "entrada_minima", value = entrada_minima)
     
     
-    tabla_amortizacion<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
-    tabla_roi<-inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
+    tabla_amortizacion <- inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
+    tabla_roi <- inversion::crea_tabla_amortizacion(tasa,cuota,prestamo,plazo_meses,fecha_inicial)
     
-    html_resultados<-inversion::recolecta_datos_de_resultado(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deudas,entrada, entrada_minima)
+    html_resultados <- inversion::recolecta_datos_de_resultado(tasacion,tasa,cuota,prestamo,plazo_meses,fecha_inicial,ingresos,deudas,entrada, entrada_minima)
     
     #salida de resultados tabla amortizacion
     # Mostrar la tabla HTML en la salida
@@ -625,16 +644,16 @@ server <- function(input, output, session) {
   
   #Calculame el maximo prestamo segun mis ingresos, gastos, entrada, plazo e interes
   observeEvent(input$boton_capacidad_pago, {
-    ingresos<-input$ingresos
-    deudas<-input$deudas
-    tasa<-input$tasa
-    plazo_meses<-input$plazo_ingresos*12
-    entrada<-input$entrada
-    gastos_hipotecarios<-input$gastos_hipotecarios
-    comisiones<-input$comisiones
+    ingresos <- input$ingresos
+    deudas <- input$deudas
+    tasa <- input$tasa
+    plazo_meses <- input$plazo_ingresos*12
+    entrada <- input$entrada
+    gastos_hipotecarios <- input$gastos_hipotecarios
+    comisiones <- input$comisiones
     
-    capacidad_pago<-calcular_capacidad_pago(ingresos, deudas, tasa, plazo_meses, entrada,gastos_hipotecarios,comisiones)
-    capacidad_pago<-as.integer(capacidad_pago)
+    capacidad_pago <- calcular_capacidad_pago(ingresos, deudas, tasa, plazo_meses, entrada,gastos_hipotecarios,comisiones)
+    capacidad_pago <- as.integer(capacidad_pago)
     
     updateNumericInput(session, "capacidad_de_pago", value = capacidad_pago)
   }) 
@@ -643,7 +662,9 @@ server <- function(input, output, session) {
   
   # # Filtra las provincias y municipios según la región seleccionada
   observeEvent(input$region, {
+    
     # Filtra las provincias según la región seleccionada
+    
     provincias_filtradas <- filter(provincias, COMUNIDAD_AUTONOMA == input$region)
     updateSelectInput(session, "provincia", choices = provincias_filtradas$PROVINCIA)
 
@@ -674,18 +695,18 @@ server <- function(input, output, session) {
   # Evento a ejecutar cuando tenemos la localidad y buscar en Idealista
   observeEvent(input$boton_compra_alquiler, {
     if (!is.null(input$provincia) && input$provincia != "" && !is.null(input$provincia) && input$municipio != "") {
-      region<-input$region
-      provincia<-input$provincia
-      municipio<-input$municipio
+      region <- input$region
+      provincia <- input$provincia
+      municipio <- input$municipio
       coordenadas<-busca_coordenadas_municipios(municipios,municipio)
       longitud <- coordenadas["longitud"]
       latitud <- coordenadas["latitud"]
-      tipo_inmueble <-input$tipo_inmueble
-      metros_inmueble_min<-input$metros_inmueble[1]
-      metros_inmueble_max<-input$metros_inmueble[2]
-      precio_inmueble_min<-input$precio_inmueble[1]
-      precio_inmueble_max<-input$precio_inmueble[2]
-      tipo_inversion<-input$tipo_inversion
+      tipo_inmueble  <- input$tipo_inmueble
+      metros_inmueble_min <- input$metros_inmueble[1]
+      metros_inmueble_max <- input$metros_inmueble[2]
+      precio_inmueble_min <- input$precio_inmueble[1]
+      precio_inmueble_max <- input$precio_inmueble[2]
+      tipo_inversion <- input$tipo_inversion
       #Salida por pestaña de datos ia_inversion
       tabla_filtro_busqueda <- data.frame(
         Variable = c("Región: ", "Provincia: ", "Municipio: ","Tipo de inversion", "Latitud: ", "Longitud: ","Tipo vivienda: ","Metros cuadrados desde: ","Metros cuadrados hasta: ","Precio inmueble desde: ","Precio inmueble hasta: "),
@@ -695,7 +716,7 @@ server <- function(input, output, session) {
       
       
       #Tengo que ver si estos datos son de idealista o de mi BBDD
-      tabla_idealista_data<-extrae_info_bbdd_idealista() #Conectate a la BBDD y extrae el contenido
+      tabla_idealista_data <-extrae_info_bbdd_idealista() #Conectate a la BBDD y extrae el contenido
       
       
       output$inmuebles <- renderUI({
@@ -728,7 +749,7 @@ filtra_datos_de_idealista <- function(idealista_data) {
   idealista_data <- idealista_data
   #Transforma resultado en formato html
   # Quito columnas para facilitar por ahora
-browser()
+
   idealista_data[,suggestedTexts:=NULL]
   idealista_data[,detailedType:=NULL]
   idealista_data <- distinct(idealista_data)
@@ -757,7 +778,7 @@ browser()
   
   # Asegurarse de que las columnas tengan el tipo de dato adecuado
   
-  browser()
+  
   #Convierte los nombres segun me interesa
   tabla_idealista_data$price <- as.numeric(tabla_idealista_data$price)
   tabla_idealista_data$size <- as.numeric(tabla_idealista_data$size)
@@ -816,12 +837,12 @@ extrae_info_bbdd_idealista <- function() {
 #Programita para descargar info de la conexion Idealista  
 idealista_conexion <- function(jsonlite, base64_enc, httr, POST, add_headers, content, suggestedTexts, detailedType) {
   # Aqui la parte de idealista
-  dotenv::load_dot_env("./acceso.env") #leo d forma secreta usuario y contraseña de acceso
+  dotenv::load_dot_env("../inst/acceso.env") #leo d forma secreta usuario y contraseña de acceso
   # Accede a tus credenciales
   #consumer_key <- Sys.getenv("CONSUMER_KEY")
   #consumer_secret <- Sys.getenv("CONSUMER_SECRET")
-  consumer_key <- "udkfigsvweox8jf07ww92b2545fy1r4i"
-  consumer_secret <- "ZvDnMFh709uY"
+  consumer_key <- "pon_aqui_tu_clave"
+  consumer_secret <- "y_aqui_tu_codigo"
   
   #Use basic authentication
   secret <- jsonlite::base64_enc(paste(consumer_key, consumer_secret, sep = ":"))
@@ -835,10 +856,10 @@ idealista_conexion <- function(jsonlite, base64_enc, httr, POST, add_headers, co
   )
   token <- paste("Bearer", httr::content(req)$access_token)
   
-  region<-input$region
-  provincia<-input$provincia
-  municipio<-input$municipio
-  coordenadas<-busca_coordenadas_municipios(municipios,municipio)
+  region <- input$region
+  provincia <- input$provincia
+  municipio <- input$municipio
+  coordenadas <- busca_coordenadas_municipios(municipios,municipio)
 
   y <- coordenadas["longitud"] #lineas verticales. meridianos
   y <- coordenadas["latitud"] #lineas horizontales a diversas alrutas, tropicos, ecuador..
@@ -850,7 +871,7 @@ idealista_conexion <- function(jsonlite, base64_enc, httr, POST, add_headers, co
   maxprice <- input$precio_inmueble[2] #precio maximo
   minsize <- input$metros_inmueble[1]  #Metroscuadrados minimos
   maxsize <- input$metros_inmueble[2] #metroscuadrados maximos
-  tipo_inversion<-input$tipo_inversion
+  tipo_inversion <- input$tipo_inversion
  
 
   #url user parameters
@@ -886,7 +907,7 @@ idealista_conexion <- function(jsonlite, base64_enc, httr, POST, add_headers, co
   
   res <- httr::POST(url, httr::add_headers("Authorization" = token))
   cont_raw <- httr::content(res)
-  browser()
+  
 
   
   #Este programita es para que estandaricen los datos. haydatos que llegan con diferente numero de columnas
@@ -912,11 +933,10 @@ idealista_conexion <- function(jsonlite, base64_enc, httr, POST, add_headers, co
   
   
   
-  
 
     
-  data<-filtra_datos_de_idealista(data)
-  browser()
+  data <-filtra_datos_de_idealista(data)
+  
 
   #Si tras consultar a Idealista en internet ha traido datos, que los agregue a la BBDD interna
   if (!is.null(cont_raw[["elementList"]])) {
@@ -953,10 +973,17 @@ idealista_conexion <- function(jsonlite, base64_enc, httr, POST, add_headers, co
 }
 
   
+
+
+
 }#fin de backlog server
 
 # Crea la aplicaciC3n Shiny
 shinyApp(ui = ui, server = server)
+
+
+#Chequeo de paquetes
+#devtools::install("./R/")
 
 
 #Subir paquete a GITHUB
@@ -979,6 +1006,12 @@ shinyApp(ui = ui, server = server)
 # devtools::check() 
 # devtools::build()
 # devtools::release()
+
+
+#Hacer que ROXIGEN compile
+# 1 desde Build + more hacer Document o Contros Shift D y asi te crea el namespace
+# 2 Check y ver errores. Corregirlos todos
+
 
 
 

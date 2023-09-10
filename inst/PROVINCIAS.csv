@@ -1,0 +1,53 @@
+COD_PROV;PROVINCIA;COD_CA;COMUNIDAD_AUTONOMA;CAPITAL_PROVINCIA
+1;Alava;16;Pais Vasco;Vitoria-Gasteiz
+2;Albacete;8;Castilla-La Mancha;Albacete
+3;Alicante;10;Comunitat Valenciana;Alacant/Alicante
+4;Almeria;1;Andalucia;Almeria
+5;avila;7;Castilla y Leon;avila
+6;Badajoz;11;Extremadura;Badajoz
+7;Illes Balears;4;Illes Balears;Palma
+8;Barcelona;9;Catalunya;Barcelona
+9;Burgos;7;Castilla y Leon;Burgos
+10;Caceres;11;Extremadura;Caceres
+11;Cadiz;1;Andalucia;Cadiz
+12;Castellon;10;Comunitat Valenciana;Castello de la Plana
+13;Ciudad Real;8;Castilla-La Mancha;Ciudad Real
+14;Cordoba;1;Andalucia;Cordoba
+15;A Coruña;12;Galicia;A Coruña
+16;Cuenca;8;Castilla-La Mancha;Cuenca
+17;Girona;9;Catalunya;Girona
+18;Granada;1;Andalucia;Granada
+19;Guadalajara;8;Castilla-La Mancha;Guadalajara
+20;Gipuzkoa;16;Pais Vasco;Donostia/San Sebastian
+21;Huelva;1;Andalucia;Huelva
+22;Huesca;2;Aragon;Huesca
+23;Jaen;1;Andalucia;Jaen
+24;Leon;7;Castilla y Leon;Leon
+25;Lleida;9;Catalunya;Lleida
+26;La Rioja;17;La Rioja;Logroño
+27;Lugo;12;Galicia;Lugo
+28;Madrid;13;Comunidad de Madrid;Madrid
+29;Malaga;1;Andalucia;Malaga
+30;Murcia;14;Region de Murcia;Murcia
+31;Navarra;15;Comunidad Foral de Navarra;Pamplona/Iruña
+32;Ourense;12;Galicia;Ourense
+33;Asturias;3;Principado de Asturias;Oviedo
+34;Palencia;7;Castilla y Leon;Palencia
+35;Las Palmas;5;Canarias;Las Palmas de Gran Canaria
+36;Pontevedra;12;Galicia;Pontevedra
+37;Salamanca;7;Castilla y Leon;Salamanca
+38;Santa Cruz de Tenerife;5;Canarias;Santa Cruz de Tenerife
+39;Cantabria;6;Cantabria;Santander
+40;Segovia;7;Castilla y Leon;Segovia
+41;Sevilla;1;Andalucia;Sevilla
+42;Soria;7;Castilla y Leon;Soria
+43;Tarragona;9;Catalunya;Tarragona
+44;Teruel;2;Aragon;Teruel
+45;Toledo;8;Castilla-La Mancha;Toledo
+46;Valencia;10;Comunitat Valenciana;València
+47;Valladolid;7;Castilla y Leon;Valladolid
+48;Bizkaia;16;Pais Vasco;Bilbao
+49;Zamora;7;Castilla y Leon;Zamora
+50;Zaragoza;2;Aragon;Zaragoza
+51;Ceuta;18;Ciudad Autonoma de Ceuta;Ceuta
+52;Melilla;19;Ciudad Autonoma de Melilla;Melilla
